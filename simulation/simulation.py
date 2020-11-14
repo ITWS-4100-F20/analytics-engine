@@ -3,7 +3,8 @@ import time
 from datetime import datetime
 from simulation.environment.scenario import Scenario
 from simulation.processes.passenger import Passenger
-
+from simulation.environment.flight_cabin import FlightCabin
+from simulation.environment.flight_manifest import FlightManifest
 def timeCheck(env: simpy.Environment):
     while True:
         print("Time is now %s" % datetime.fromtimestamp(env.now))
@@ -17,6 +18,10 @@ def runSimulation(scenario: Scenario):
         Passenger(env, 244, 'John',  time.mktime(time.strptime("12/01/2020 10:00:00", "%d/%m/%Y %H:%M:%S"))- scenario.oversaleStartTime),
         Passenger(env, 34, 'Joe',  time.mktime(time.strptime("12/01/2020 12:30:00", "%d/%m/%Y %H:%M:%S"))- scenario.oversaleStartTime)
     ]
+    cabins = [ FlightCabin('Y', 2, [244, 34]), ] 
+    manifest = FlightManifest(env, 123, 133, passengers, cabins)
+    FlightManifest.initPassengers(manifest)
+
     for p in passengers:
         env.process(p.checkIn())
     env.process(timeCheck(env))

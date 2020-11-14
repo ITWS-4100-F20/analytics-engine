@@ -13,4 +13,4 @@ class Passenger(object):
     def checkIn(self):
         yield self.env.timeout(self.checkInTime)
         print("Passenger %d has checked in" % self.id, datetime.fromtimestamp(self.env.now))
-        self.checked_in.succeed()
+        return self.checked_in.succeed()
