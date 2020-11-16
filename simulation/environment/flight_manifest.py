@@ -1,9 +1,10 @@
 import simpy
+from typing import Any, List
 from simpy.events import AnyOf
 from simulation.environment.flight_cabin import FlightCabin
 from simulation.processes.passenger import Passenger
 class FlightManifest(object):
-    def __init__(self, env: simpy.Environment ,flightID: int, flightNum: int, passengerList: list, cabinBookings: list):
+    def __init__(self, env: simpy.Environment ,flightID: int, flightNum: int, passengerList: List[Passenger], cabinBookings: list):
         self.env = env
         self.flightID = flightID
         self.flightnum = flightNum
@@ -12,12 +13,22 @@ class FlightManifest(object):
         self.seatingReady = env.event()
         self.checkedIn = []
         self.seating = []
-        self.initPassengers()
+        
+    def setupPassengers(self) -> None:
+        print("Setting up passengers")
+        eventList = []
+        for p in self.passengerList:
+            self.env.process(p.checkIn())
+            eventList.append(p.checked_in)
+        self.env.process(self.passengerWait(eventList))
 
-    def initPassengers(self):
-        print(self.flightID)
-        pList = [p.checked_in for p in self.passengerList]
-        while True:
-            yield AnyOf(self.env, pList)
-            print("someone checked in")
-            return
+    def passengerWait(self, eventList: List[simpy.Event]):
+        while len(eventList) > 0:
+            checked_in = yield AnyOf(self.env, eventList) 
+            for p in checked_in:
+                self.checkedIn.append(checked_in[p])
+                eventList.remove(p)
+
+    def finalOutput(self):
+        print("Checked in:", len(self.checkedIn))
+        print("Seated:", len(self.seating))
