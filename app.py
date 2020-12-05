@@ -1,9 +1,9 @@
 #this will be used to host the FLASK api server
 import time
-from simulation import simulation
 from simulation.support.database import client
 from simulation.environment.scenario import Scenario
 from simulation.support.util import *
+from simulation.simulation import *
 
 from flask import Flask, request
 
@@ -16,12 +16,15 @@ def startSim():
     scenario = getScenario('nick_test')
     testScenario = Scenario(time.mktime(startTime), time.mktime(endTime), scenario["start"], scenario["dest"]
         , scenario["manifestId"], scenario["cabins"], scenario["flightid"], scenario["flightnum"])
-    simulation.runSimulation(testScenario)
+    runSimulation(testScenario)
 
 @app.route('/simulation')
 def simulation():
     if request.method == 'POST':
         print('POST')
+    if request.method == 'GET':
+        startSim()
+        return 'YAY'
 
 if __name__ == '__main__':
     app.run(port=3031)

@@ -37,9 +37,7 @@ class Passenger(object):
         yield self.env.timeout(self.checkInTime)
         print("Passenger %d has checked in" % self.id, datetime.fromtimestamp(self.env.now))
         self.checked_in.succeed(self.id)
-        self.req = self.cabin.request()
-        yield self.req
-        print("Passenger %d has recieved a seat" % self.id, datetime.fromtimestamp(self.env.now)) 
+        self.reqCabin()
         gateArrivalTime = random.randrange(600, self.scenario.flightBoardingTime - self.env.now - 600)
         yield self.env.timeout(gateArrivalTime if gateArrivalTime > 0 else 1)
         print("Passenger %d has arrived at the gate" % self.id, datetime.fromtimestamp(self.env.now)) 
@@ -48,4 +46,9 @@ class Passenger(object):
     def respondToBid(self, offer:dict, flight:dict):
         pass
         #takes info about flight offer and self and responds based on probabiltiy from neural network to offer.
+
+    def reqCabin(self):
+        self.req = self.cabin.request()
+        yield self.req
+        print("Passenger %d has recieved a seat" % self.id, datetime.fromtimestamp(self.env.now)) 
     
