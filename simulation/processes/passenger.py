@@ -2,6 +2,7 @@ import simpy
 import random
 from datetime import datetime
 from simulation.environment.scenario import Scenario
+from simulation.environment.flight_cabin import FlightCabin
 class Passenger(object):
     def __init__(self, env: simpy.Environment ,scenario: Scenario, id: int, name: str, checkInTime: int):
         # passenger data model info
@@ -12,6 +13,8 @@ class Passenger(object):
         self.checkInTime = checkInTime
         self.checked_in = env.event()
         self.atGate = False
+        self.req = None
+        self.cabin = None
         self.ml = { #these are a bumch of parameters to be grabbed from the database about the customer.
             "age": 42,
             "miles": 200123,
@@ -20,17 +23,31 @@ class Passenger(object):
             "gender": 0.0,
             "memberlevel": 1,
             "lastflighttime": 124
-        }     
+        }
+
+    def setCabin(self, cabin):
+        if self.req is not None:
+            self.cabin.release(self.req)
+        self.cabin = cabin
+
+    def leaveFlight(self):
+        self.cabin.release(self.req)
 
     def checkIn(self):
         yield self.env.timeout(self.checkInTime)
         print("Passenger %d has checked in" % self.id, datetime.fromtimestamp(self.env.now))
         self.checked_in.succeed(self.id)
-        gateArrivalTime = random.randrange(600, self.scenario.flightBoardingTime - self.env.now - 600) 
-        yield self.env.timeout(gateArrivalTime)
+        gateArrivalTime = random.randrange(600, self.scenario.flightBoardingTime - self.env.now - 600)
+        yield self.env.timeout(gateArrivalTime if gateArrivalTime > 0 else 1)
         print("Passenger %d has arrived at the gate" % self.id, datetime.fromtimestamp(self.env.now)) 
         self.atGate = True
 
     def respondToBid(self, offer:dict, flight:dict):
         pass
         #takes info about flight offer and self and responds based on probabiltiy from neural network to offer.
+
+    def reqCabin(self, env):
+        self.req = self.cabin.request()
+        yield self.req
+        print("Passenger %d has recieved a seat" % self.id, datetime.fromtimestamp(self.env.now)) 
+    

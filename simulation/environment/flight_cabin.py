@@ -1,6 +1,8 @@
 
-class FlightCabin(object):
-    def __init__(self, cabinType: str, capacity: int, passengers: list):
+import simpy
+
+class FlightCabin(simpy.Resource):
+    def __init__(self, env, cabinType: str, capacity: int, passengers:list):
+        super(FlightCabin, self).__init__(env, capacity)
         self.cabinType = cabinType
-        self.capacity = capacity
         self.passengers = passengers

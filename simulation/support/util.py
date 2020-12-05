@@ -28,11 +28,16 @@ def getPassengers(n:int, scenario, env):
         passengers.append(Passenger(env, scenario, passenger["number"], passenger["name"],  delay if delay >= 0 else 1 ))
     return passengers
 
-def getCabins(cabinSpec:dict, passengers:list):
+def getCabins(env, cabinSpec:dict, passengers:list):
     cabins = []
     currentPass = 0
     for i in cabinSpec.keys():
-        cabins.append(FlightCabin(i, int(cabinSpec[i]["capacity"]), passengers[currentPass:currentPass+int(cabinSpec[i]["passengers"])]))
+        cabinpass = passengers[currentPass:currentPass+int(cabinSpec[i]["passengers"])]
+        newcabin = FlightCabin(env, i, int(cabinSpec[i]["capacity"]), cabinpass)
+        for passenger in cabinpass:
+            passenger.setCabin(newcabin)
+
+        cabins.append(newcabin)
         currentPass += int(cabinSpec[i]["passengers"])
     return cabins
 
