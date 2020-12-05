@@ -20,7 +20,6 @@ class FlightManifest(object):
         for p in self.passengerList:
             self.env.process(p.checkIn())
             eventList.append(p.checked_in)
-            self.env.process(p.reqCabin(self.env))
         self.env.process(self.passengerWait(eventList))
 
     def passengerWait(self, eventList: List[simpy.Event]):
