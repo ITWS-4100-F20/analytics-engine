@@ -15,6 +15,11 @@ def timeCheck(env: simpy.Environment):
         wait_duration = 3600
         yield env.timeout(wait_duration)
 
+def optionEval(env: simpy.Environment, man: FlightManifest):
+    while True:
+        print("Evaluated situation at %s, manifestState %d" % (datetime.fromtimestamp(env.now), len(man.checkedIn)))
+        yield env.timeout(6000)
+
 def runSimulation(scenario: Scenario):
     print("Oversale Simulation initiated", datetime.fromtimestamp(scenario.oversaleStartTime), "for flight", 133, "from", scenario.departureAirport, "to", scenario.arrivalAirport, ".")
     env = simpy.Environment(initial_time=scenario.oversaleStartTime)
@@ -24,5 +29,6 @@ def runSimulation(scenario: Scenario):
     manifest = FlightManifest(env, scenario.flightid, scenario.flightnum, passengers, cabins)
     manifest.setupPassengers()
     env.process(timeCheck(env))
+    #env.process(optionEval(env, manifest))
     env.run(until=scenario.flightBoardingTime)      
     manifest.finalOutput()
