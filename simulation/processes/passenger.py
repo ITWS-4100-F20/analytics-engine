@@ -12,6 +12,15 @@ class Passenger(object):
         self.checkInTime = checkInTime
         self.checked_in = env.event()
         self.atGate = False
+        self.ml = { #these are a bumch of parameters to be grabbed from the database about the customer.
+            "age": 42,
+            "miles": 200123,
+            "checked": 1,
+            "carryon": 1,
+            "gender": 0.0,
+            "memberlevel": 1,
+            "lastflighttime": 124
+        }     
 
     def checkIn(self):
         yield self.env.timeout(self.checkInTime)
@@ -21,3 +30,7 @@ class Passenger(object):
         yield self.env.timeout(gateArrivalTime)
         print("Passenger %d has arrived at the gate" % self.id, datetime.fromtimestamp(self.env.now)) 
         self.atGate = True
+
+    def respondToBid(self, offer:dict, flight:dict):
+        pass
+        #takes info about flight offer and self and responds based on probabiltiy from neural network to offer.
