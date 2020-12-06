@@ -92,6 +92,7 @@ class Passenger(object):
             self.details["compensation"].append(comp)
             response = 1
         self.event.succeed({"pid" : self.id, "event_type" : "BID", "details" : {
+            "name" : self.name,
             "amount" : comp["comp_amount"],
             "ETC" : bid["etc_comp"],
             "response" : response
