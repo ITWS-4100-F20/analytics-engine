@@ -14,14 +14,11 @@ app = Flask(__name__)
 def startSim(scen, data):
     runSimulation(scen)
 
-@app.route('/simulation/<name>/', methods=["GET", "POST"])
+@app.route('/simulation', methods=["POST"])
 def simulation(name):
-    data = None
-    if request.method == 'POST':
-        data = dict(request.json)
-        print(data)
-    scen = getScenario(name)
-    thread = threading.Thread(target = startSim, kwargs={'scen' : scen, 'data' : data})
+    data = dict(request.json)
+    scen = getScenario(data["Id"])
+    thread = threading.Thread(target = startSim, kwargs={'scen' : scen, 'data' : data["parameters"]})
     thread.start()
     return scen.uuid
 
