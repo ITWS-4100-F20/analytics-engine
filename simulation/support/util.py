@@ -42,7 +42,25 @@ def getCabins(env, cabinSpec:dict, passengers:list):
     return cabins
 
 def getScenario(scenarioname:str):
+    startTime = time.strptime("12/01/2020 01:00:00", "%d/%m/%Y %H:%M:%S")
+    endTime = time.strptime("12/01/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
     scenario = dict(client["simulation_data"]["scenarios"].find_one({"id":scenarioname}))
+    scenario = Scenario(time.mktime(startTime), time.mktime(endTime), scenario["Dept"], scenario["Arriv"]
+                    , scenario["PassengerList"], scenario["cabins"], scenario["FlightNum"])
+    client["simulation_data"]["Simulations"].insert_one({
+        "id" : scenario.uuid,
+        "scenario_name": scenarioname,
+        "status" : "RUNNING",
+        "parameters" : {}
+    })
+    client["simulation_data"]["Simulation_Events"].insert_one({
+        "sim_id" : scenario.uuid, 
+        "event_list" : []
+    })
+    client["simulation_data"]["Simulation_Volunteers"].insert_one({
+        "sim_id" : scenario.uuid, 
+        "vol_list" : []
+    }) 
     return scenario
 
 def logger(eventtype:str, msg:str, time:str):

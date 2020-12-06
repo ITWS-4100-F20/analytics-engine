@@ -11,11 +11,7 @@ app = Flask(__name__)
 
 
 def startSim(scen, data):
-    startTime = time.strptime("12/01/2020 01:00:00", "%d/%m/%Y %H:%M:%S")
-    endTime = time.strptime("12/01/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
-    scenario = getScenario(scen)
-    testScenario = Scenario(time.mktime(startTime), time.mktime(endTime), scenario["Dept"], scenario["Arriv"]
-        , scenario["PassengerList"], scenario["cabins"], scenario["FlightNum"])
+    testScenario = getScenario(scen)
     runSimulation(testScenario)
     return testScenario.uuid
 

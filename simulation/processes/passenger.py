@@ -11,11 +11,30 @@ class Passenger(object):
         self.scenario = scenario
         self.id = id
         self.name = name
+        self.volunteer_method = "DEFAULT"
         self.checkInTime = checkInTime
         self.event = env.event()
+        self.finalDest = scenario.arrivalAirport
         self.atGate = False
+        self.processed = False
         self.req = None
         self.cabin = None
+        self.details = {
+            "bid_history" : [
+
+            ],
+            "compensation" : [
+
+            ],
+            "vol_info" : {
+                "cabin" : "Default",
+                "fin_dest" : self.finalDest,
+                "id" : self.id,
+                "name" : self.name,
+                "processed" : True,
+                "vol_method" : "DEFAULT"
+            }
+        }
         self.ml = { #these are a bumch of parameters to be grabbed from the database about the customer.
             "age": 42,
             "miles": 200123,
@@ -26,9 +45,10 @@ class Passenger(object):
             "lastflighttime": 124
         }
 
-    def setCabin(self, cabin):
+    def setCabin(self, cabin:FlightCabin):
         if self.req is not None:
             self.cabin.release(self.req)
+        self.details["vol_info"]["cabin"] = cabin.cabinType
         self.cabin = cabin
 
     def leaveFlight(self):
@@ -62,6 +82,26 @@ class Passenger(object):
             "response" : 1
             }
         })
+        self.details["bid_history"].append(
+            {
+                "accepted" : True,
+                "bid_id" : 123,
+                "etc_comp" : 1,
+                "initiated_by" : "USER",
+                "miles_comp": 30,
+                "timestamp" : datetime.fromtimestamp(self.env.now).isoformat(),
+                "vol_id" : self.id,
+                "vol_name": self.name
+            }
+        )
+        self.details["compensation"].append(
+            {
+                "comp_amount": 1,
+                "comp_id": 1,
+                "comp_type": "FOOOOOD",
+                "vol_id": 1
+            }
+        )
         yield self.env.timeout(time)
         #retrive bid so passenger gets it
         #print("Passenger %d has responded to bid number %d with %r." % (self.id, 21, True), datetime.fromtimestamp(self.env.now)) 

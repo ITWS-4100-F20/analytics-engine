@@ -24,7 +24,7 @@ def runSimulation(scenario: Scenario):
     totalpassengers = sum(scenario.cabins[i]["passengers"] for i in scenario.cabins.keys())
     passengers = getPassengers(totalpassengers, scenario, env)
     cabins = getCabins(env, scenario.cabins, passengers)
-    manifest = FlightManifest(env, scenario.flightnum, passengers, cabins)
+    manifest = FlightManifest(scenario, env, scenario.flightnum, passengers, cabins)
     manifest.setupPassengers()
     env.process(timeCheck(env))
     env.run(until=scenario.flightBoardingTime)      
