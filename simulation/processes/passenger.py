@@ -58,14 +58,18 @@ class Passenger(object):
     def cancel(self):
         while True:
             if random.randint(0,1000) == 0:
-                self.event.succeed({"pid" : self.id, "event_type" : "CANCELED", "details" : {}})
+                self.event.succeed({"pid" : self.id, "event_type" : "CANCELED", "details" : {
+                    "name" : self.name
+                }})
                 return False
             yield self.env.timeout(1000)
 
     def checkIn(self):
         yield self.env.timeout(self.checkInTime)
         #print("Passenger %d has checked in" % self.id, datetime.fromtimestamp(self.env.now))
-        self.event.succeed({"pid" : self.id, "event_type" : "CHECK_IN", "details" : {}})
+        self.event.succeed({"pid" : self.id, "event_type" : "CHECK_IN", "details" : {
+            "name" : self.name
+        }})
         self.env.process(self.reqCabin())
         try:
             gateArrivalTime = random.randrange(600, self.scenario.flightBoardingTime - self.env.now - 600)

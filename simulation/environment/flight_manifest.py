@@ -63,6 +63,7 @@ class FlightManifest(object):
                 eventList.append((self.passengerList[events[p]["pid"]].event))
 
     def finalOutput(self):
-        loggy.logPassengers([self.passengerList[i] for i in self.volunteered])
+        loggy.logPassengers([self.passengerList[i] for i in self.volunteered], True)
+        loggy.logPassengers(self.passengerList.values(), False)
         print("Checked in:", len(self.checkedIn))
         print("Seated:", len(self.seating))

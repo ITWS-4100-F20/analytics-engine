@@ -52,6 +52,10 @@ def getScenario(scenarioname:str, parameters={}):
         "sim_id" : scenario.uuid, 
         "vol_list" : []
     }) 
+    client["simulation_data"]["Simulation_Passengers"].insert_one({
+        "sim_id" : scenario.uuid, 
+        "vol_list" : []
+    }) 
     return scenario
 
 def updateSenario(uuid:str):
