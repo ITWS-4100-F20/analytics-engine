@@ -41,7 +41,8 @@ def getScenario(scenarioname:str, parameters={}):
         "id" : scenario.uuid,
         "scenario_name": scenarioname,
         "status" : "RUNNING",
-        "parameters" : parameters
+        "parameters" : parameters,
+        "timestamp" : datetime.now().isoformat()
     })
     client["simulation_data"]["Simulation_Events"].insert_one({
         "sim_id" : scenario.uuid, 
