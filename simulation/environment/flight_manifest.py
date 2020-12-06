@@ -5,9 +5,11 @@ from simpy.events import AnyOf
 from simulation.environment.flight_cabin import FlightCabin
 from simulation.processes.passenger import Passenger
 from simulation.support.logger import loggy
+from simulation.environment.scenario import Scenario
 
 class FlightManifest(object):
-    def __init__(self, env: simpy.Environment , flightNum: int, passengerList: List[Passenger], cabinBookings: list):
+    def __init__(self, scen: Scenario, env: simpy.Environment , flightNum: int, passengerList: List[Passenger], cabinBookings: list):
+        self.scenario = scen
         self.env = env
         self.flightnum = flightNum
         self.passengerList = {p.id : p for p in passengerList}
@@ -56,10 +58,11 @@ class FlightManifest(object):
                         self.volunteered.remove(events[p]["pid"])
                     if events[p]["pid"] in self.checkedIn:
                         self.checkedIn.remove(events[p]["pid"])
-                loggy.log(events[p], datetime.fromtimestamp(self.env.now).isoformat())
+                loggy.logEvents(events[p], datetime.fromtimestamp(self.env.now).isoformat())
                 eventList.remove(p)
                 eventList.append((self.passengerList[events[p]["pid"]].event))
 
     def finalOutput(self):
+        loggy.logPassengers(self.passengerList.values())
         print("Checked in:", len(self.checkedIn))
         print("Seated:", len(self.seating))
