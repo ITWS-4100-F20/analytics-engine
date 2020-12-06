@@ -11,8 +11,9 @@ from flask import Flask, request
 app = Flask(__name__)
 
 
-def startSim(scen, data):
+def startSim(scen:Scenario, data):
     runSimulation(scen)
+    updateSenario(scen.uuid)
 
 @app.route('/simulation', methods=["POST"])
 def simulation():

@@ -29,7 +29,6 @@ class Comptroller(object):
     
     def getCompensation(self, p):
         bidStart = flatten([dict(i) for i in client["simulation_data"]["Compensation"].find({}).skip(random.randint(0,self.len-1)).limit(1)])[0]
-        print(bidStart)
         bid = {
             "accepted" : False,
             "bid_id" : self.bids,
