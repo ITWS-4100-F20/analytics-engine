@@ -32,8 +32,8 @@ def getCabins(env, cabinSpec:dict, passengers:list):
     return cabins
 
 def getScenario(scenarioname:str, parameters={}):
-    startTime = time.strptime("12/01/2020 01:00:00", "%d/%m/%Y %H:%M:%S")
-    endTime = time.strptime("12/01/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
+    startTime = time.strptime("12/01/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
+    endTime = time.strptime("12/02/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
     scenario = dict(client["simulation_data"]["scenarios"].find_one({"id":scenarioname}))
     scenario = Scenario(time.mktime(startTime), time.mktime(endTime), scenario["Dept"], scenario["Arriv"]
                     , scenario["PassengerList"], scenario["cabins"], scenario["FlightNum"])
@@ -42,7 +42,22 @@ def getScenario(scenarioname:str, parameters={}):
         "scenario_name": scenarioname,
         "status" : "RUNNING",
         "parameters" : parameters,
-        "timestamp" : datetime.now().isoformat()
+        "timestamp" : datetime.now().isoformat(),
+        "info" : {
+            "dept" : scenario.departureAirport,
+            "arriv" : scenario.arrivalAirport,
+            "flight_number" : 1768,
+            "start_time" : "2020-12-01T22:00:00+0000",
+            "departure_time" : "2020-12-02T22:00:00+0000",
+            "finalize_time" : "2020-12-02T22:00:00+0000",
+            "outcome" : "success"
+        },
+        "cabins" : scenario.cabins,
+        "volunteers" : {
+            "total_bids" : 0,
+            "total_volunteers" : 0,
+            "total_volunteers_processed" : 0
+        }
     })
     client["simulation_data"]["Simulation_Events"].insert_one({
         "sim_id" : scenario.uuid, 

@@ -81,8 +81,6 @@ class Passenger(object):
 
     def respondToBid(self):
         time = random.randrange(100, 600)
-
-
         yield self.env.timeout(time)
         bid, comp = compy.getCompensation(self)
         bid["accepted"] = True if random.randint(0,10) > 4 else False

@@ -36,4 +36,12 @@ class Logger(object):
                 }
             }
         )
+        if not volunteer:
+            total_bids = sum([len(i.details["bid_history"]) for i in passengers])
+            client["simulation_data"]["Simulations"].update_one({"id" : self.name}, {"$set" : {"volunteers":{"total_bids":total_bids}}})
+        if volunteer:
+            total_volunteers = len(passengers)
+            total_processed = sum([1 if i.processed else 0 for i in passengers])
+            client["simulation_data"]["Simulations"].update_one({"id" : self.name}, {"$set" : {"volunteers":{"total_volunteers":total_volunteers, "total_volunteers_processed":total_processed}}})
+
 loggy = Logger()
