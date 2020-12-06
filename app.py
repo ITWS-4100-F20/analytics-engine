@@ -10,7 +10,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 
-def startSim(scen):
+def startSim(scen, data):
     startTime = time.strptime("12/01/2020 01:00:00", "%d/%m/%Y %H:%M:%S")
     endTime = time.strptime("12/01/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
     scenario = getScenario(scen)
@@ -19,12 +19,13 @@ def startSim(scen):
     runSimulation(testScenario)
     return testScenario.uuid
 
-@app.route('/simulation/<name>')
+@app.route('/simulation/<name>/', methods=["GET", "POST"])
 def simulation(name):
+    data = None
     if request.method == 'POST':
-        print('POST')
-    if request.method == 'GET':
-        return startSim(name)
+        data = dict(request.json)
+        print(data)
+    return startSim(name, data)
 
 if __name__ == '__main__':
     app.run(port=3031)
