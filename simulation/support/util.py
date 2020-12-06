@@ -42,7 +42,7 @@ def getCabins(env, cabinSpec:dict, passengers:list):
     return cabins
 
 def getScenario(scenarioname:str):
-    scenario = dict(client["simulation_data"]["scenarios_nick"].find_one({"name":"nick_test"}))
+    scenario = dict(client["simulation_data"]["scenarios"].find_one({"id":scenarioname}))
     return scenario
 
 def logger(eventtype:str, msg:str, time:str):
