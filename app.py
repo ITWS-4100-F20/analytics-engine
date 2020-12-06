@@ -15,12 +15,12 @@ def startSim(scen, data):
     runSimulation(scen)
 
 @app.route('/simulation', methods=["POST"])
-def simulation(name):
+def simulation():
     data = dict(request.json)
-    scen = getScenario(data["Id"])
+    scen = getScenario(data["scenarioId"])
     thread = threading.Thread(target = startSim, kwargs={'scen' : scen, 'data' : data["parameters"]})
     thread.start()
-    return scen.uuid
+    return {"sim_id" :scen.uuid }
 
 if __name__ == '__main__':
     app.run(port=3031)
