@@ -3,6 +3,7 @@ import random
 from datetime import datetime
 from simulation.environment.scenario import Scenario
 from simulation.environment.flight_cabin import FlightCabin
+from simulation.environment.compensation import compy
 
 class Passenger(object):
     def __init__(self, env: simpy.Environment ,scenario: Scenario, id: int, name: str, checkInTime: int):
@@ -76,33 +77,23 @@ class Passenger(object):
 
     def respondToBid(self):
         time = random.randrange(100, 600)
+
+
+        yield self.env.timeout(time)
+        bid, comp = compy.getCompensation(self)
+        bid["accepted"] = True if random.randint(0,10) > 4 else False
+        self.details["bid_history"].append(bid)
+        response = 0
+        if bid["accepted"]:
+            self.details["compensation"].append(comp)
+            response = 1
         self.event.succeed({"pid" : self.id, "event_type" : "BID", "details" : {
-            "amount" : 69,
-            "ETC" : 100,
-            "response" : 1
+            "amount" : comp["comp_amount"],
+            "ETC" : bid["etc_comp"],
+            "response" : response
             }
         })
-        self.details["bid_history"].append(
-            {
-                "accepted" : True,
-                "bid_id" : 123,
-                "etc_comp" : 1,
-                "initiated_by" : "USER",
-                "miles_comp": 30,
-                "timestamp" : datetime.fromtimestamp(self.env.now).isoformat(),
-                "vol_id" : self.id,
-                "vol_name": self.name
-            }
-        )
-        self.details["compensation"].append(
-            {
-                "comp_amount": 1,
-                "comp_id": 1,
-                "comp_type": "FOOOOOD",
-                "vol_id": 1
-            }
-        )
-        yield self.env.timeout(time)
+        
         #retrive bid so passenger gets it
         #print("Passenger %d has responded to bid number %d with %r." % (self.id, 21, True), datetime.fromtimestamp(self.env.now)) 
         #takes info about flight offer and self and responds based on probabiltiy from neural network to offer.

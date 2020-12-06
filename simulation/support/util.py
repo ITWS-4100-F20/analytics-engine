@@ -41,7 +41,7 @@ def getCabins(env, cabinSpec:dict, passengers:list):
         currentPass += int(cabinSpec[i]["passengers"])
     return cabins
 
-def getScenario(scenarioname:str):
+def getScenario(scenarioname:str, parameters={}):
     startTime = time.strptime("12/01/2020 01:00:00", "%d/%m/%Y %H:%M:%S")
     endTime = time.strptime("12/01/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
     scenario = dict(client["simulation_data"]["scenarios"].find_one({"id":scenarioname}))
@@ -51,7 +51,7 @@ def getScenario(scenarioname:str):
         "id" : scenario.uuid,
         "scenario_name": scenarioname,
         "status" : "RUNNING",
-        "parameters" : {}
+        "parameters" : parameters
     })
     client["simulation_data"]["Simulation_Events"].insert_one({
         "sim_id" : scenario.uuid, 
