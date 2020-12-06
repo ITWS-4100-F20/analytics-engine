@@ -23,8 +23,11 @@ class Logger(object):
         with concurrent.futures.ThreadPoolExecutor() as exc:
             exc.submit(self._logger, data = data, time = time)
     
-    def logPassengers(self, passengers:list):
-        client["simulation_data"]["Simulation_Volunteers"].update_one(
+    def logPassengers(self, passengers:list, volunteer):
+        loc = "Simulation_Passengers"
+        if volunteer:
+            loc = "Simulation_Volunteers"
+        client["simulation_data"][loc].update_one(
             {"sim_id": self.name},
             {"$push": {
                 "vol_list" : {
