@@ -4,27 +4,27 @@ from simulation.support.database import client
 from simulation.environment.scenario import Scenario
 from simulation.support.util import *
 from simulation.simulation import *
-
+import uuid
 from flask import Flask, request
 
 app = Flask(__name__)
 
 
-def startSim():
+def startSim(scen):
     startTime = time.strptime("12/01/2020 01:00:00", "%d/%m/%Y %H:%M:%S")
     endTime = time.strptime("12/01/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
-    scenario = getScenario('nick_test')
-    testScenario = Scenario(time.mktime(startTime), time.mktime(endTime), scenario["start"], scenario["dest"]
-        , scenario["manifestId"], scenario["cabins"], scenario["flightid"], scenario["flightnum"])
+    scenario = getScenario(scen)
+    testScenario = Scenario(time.mktime(startTime), time.mktime(endTime), scenario["Dept"], scenario["Arriv"]
+        , scenario["PassengerList"], scenario["cabins"], scenario["FlightNum"])
     runSimulation(testScenario)
+    return testScenario.uuid
 
-@app.route('/simulation')
-def simulation():
+@app.route('/simulation/<name>')
+def simulation(name):
     if request.method == 'POST':
         print('POST')
     if request.method == 'GET':
-        startSim()
-        return 'YAY'
+        return startSim(name)
 
 if __name__ == '__main__':
     app.run(port=3031)
