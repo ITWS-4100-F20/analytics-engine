@@ -54,5 +54,8 @@ def getScenario(scenarioname:str, parameters={}):
     }) 
     return scenario
 
+def updateSenario(uuid:str):
+    client["simulation_data"]["Simulations"].update_one({"id" : uuid}, {"$set" : {"status":"COMPLETE"}})
+
 def logger(eventtype:str, msg:str, time:str):
     pass
