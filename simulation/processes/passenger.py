@@ -19,7 +19,7 @@ class Passenger(object):
         self.atGate = False
         self.processed = False
         self.req = None
-        self.cabin = None
+        self.cabin:FlightCabin = None
         self.details = {
             "bid_history" : [
 
@@ -33,7 +33,12 @@ class Passenger(object):
                 "id" : self.id,
                 "name" : self.name,
                 "processed" : True,
-                "vol_method" : "DEFAULT"
+                "vol_method" : "DEFAULT",
+                "group" : "No",
+                "volstatus" : None,
+                "checkintime" : checkInTime,
+                "checkinmethond" : "APP",
+                "processed" : "No" if self.processed else "Yes"
             }
         }
         self.ml = { #these are a bumch of parameters to be grabbed from the database about the customer.
@@ -62,7 +67,7 @@ class Passenger(object):
                     "name" : self.name
                 }})
                 return False
-            yield self.env.timeout(1000)
+            yield self.env.timeout(60000)
 
     def checkIn(self):
         yield self.env.timeout(self.checkInTime)
