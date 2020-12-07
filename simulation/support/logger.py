@@ -27,10 +27,9 @@ class Logger(object):
         loc = "Simulation_Passengers"
         if volunteer:
             loc = "Simulation_Volunteers"
-        else:
-            for i in passengers:
-                if i.details["vol_info"]["processed"] == False:
-                    i.details["compensation"] = []
+        for i in passengers:
+            if i.details["vol_info"]["processed"] == False:
+                i.details["compensation"] = []
         client["simulation_data"][loc].update_one(
             {"sim_id": self.name},
             {"$push": {
