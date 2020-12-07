@@ -34,16 +34,17 @@ class Comptroller(object):
             "bid_id" : self.bids,
             "etc_comp" : bidStart["etc_comp"],
             "initiated_by" : "USER",
-            "miles_comp": bidStart["miles_comp"],
+            "miles_comp": 5 * bidStart["etc_comp"],
             "timestamp" : datetime.fromtimestamp(p.env.now).isoformat(),
             "vol_id" : p.id,
             "vol_name": p.name
         }
         self.bids += 1
+        compChosen= (random.choice([(bidStart["etc_comp"], "ETC"),(bidStart["etc_comp"] * 5, "MILES")]))
         comp = {
-          "comp_amount": bidStart["comp_amount"],
+          "comp_amount": compChosen[0],
           "comp_id": 1,
-          "comp_type": bidStart["comp_type"],
+          "comp_type": compChosen[1],
           "vol_id": 1
         }
         return bid, comp

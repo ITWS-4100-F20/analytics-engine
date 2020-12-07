@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 
 def startSim(scen:Scenario, data):
-    runSimulation(scen)
+    runSimulation(scen, data)
     updateSenario(scen.uuid)
 
 @app.route('/simulation', methods=["POST"])
