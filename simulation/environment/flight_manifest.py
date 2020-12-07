@@ -75,7 +75,8 @@ class FlightManifest(object):
         volpass.sort(key=lambda x: x.bidAmount())
         for cabin in self.scenario.cabins.keys():
             diff = self.scenario.cabins[cabin]["passengers"] - self.scenario.cabins[cabin]["capacity"]
-            diff if diff > 0 else 0
+            diff = diff if diff > 0 else 0
+            print("\t\t\t",diff,cabin)
             for i in volpass:
                 if diff == 0:
                     break
