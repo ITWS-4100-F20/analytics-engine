@@ -25,6 +25,7 @@ defaultCompensationList = [
 class Comptroller(object):
     def __init__(self):
         self.bids = 0
+        self.comp = 0
         self.len = client["simulation_data"]["Compensation"].count()
     
     def getCompensation(self, p):
@@ -43,10 +44,11 @@ class Comptroller(object):
         compChosen= (random.choice([(bidStart["etc_comp"], "ETC"),(bidStart["etc_comp"] * 5, "MILES")]))
         comp = {
           "comp_amount": compChosen[0],
-          "comp_id": 1,
+          "comp_id": self.comp,
           "comp_type": compChosen[1],
           "vol_id": 1
         }
+        self.comp += 1
         return bid, comp
 
 compy = Comptroller()

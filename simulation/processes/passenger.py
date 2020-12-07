@@ -94,6 +94,7 @@ class Passenger(object):
         self.details["bid_history"].append(bid)
         response = 0
         if bid["accepted"]:
+            comp["vol_id"] = self.id
             self.details["compensation"].append(comp)
             response = 1
         self.event.succeed({"pid" : self.id, "event_type" : "BID", "details" : {
