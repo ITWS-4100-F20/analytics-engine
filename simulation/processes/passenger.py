@@ -12,7 +12,7 @@ class Passenger(object):
         self.scenario = scenario
         self.id = id
         self.name = name
-        self.volunteer_method = "DEFAULT"
+        self.volunteer_method = random.choice(["APP", "WEB", "KIOSK", "GATE"])
         self.checkInTime = checkInTime
         self.event = env.event()
         self.finalDest = scenario.arrivalAirport
@@ -32,13 +32,12 @@ class Passenger(object):
                 "fin_dest" : self.finalDest,
                 "id" : self.id,
                 "name" : self.name,
-                "processed" : True,
-                "vol_method" : "DEFAULT",
+                "processed" : False,
+                "vol_method" : self.volunteer_method,
                 "group" : "No",
                 "volstatus" : None,
                 "checkintime" : checkInTime,
                 "checkinmethond" : "APP",
-                "processed" : "No" if self.processed else "Yes"
             }
         }
         self.ml = { #these are a bumch of parameters to be grabbed from the database about the customer.
@@ -58,7 +57,8 @@ class Passenger(object):
         self.cabin = cabin
 
     def leaveFlight(self):
-        self.cabin.release(self.req)
+        if self.cabin != None:
+            self.cabin.release(self.req)
 
     def cancel(self):
         while True:
@@ -66,6 +66,8 @@ class Passenger(object):
                 self.event.succeed({"pid" : self.id, "event_type" : "CANCELED", "details" : {
                     "name" : self.name
                 }})
+                if self.cabin != None:
+                    self.cabin.release(self.req)
                 return False
             yield self.env.timeout(60000)
 
@@ -101,6 +103,9 @@ class Passenger(object):
             "response" : response
             }
         })
+
+    def bidAmount(self):
+        return self.details["compensation"][-1]["comp_amount"]
         
         #retrive bid so passenger gets it
         #print("Passenger %d has responded to bid number %d with %r." % (self.id, 21, True), datetime.fromtimestamp(self.env.now)) 

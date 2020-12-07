@@ -62,8 +62,31 @@ class FlightManifest(object):
                 eventList.remove(p)
                 eventList.append((self.passengerList[events[p]["pid"]].event))
 
+    def cmp_pass(self, a:Passenger, b:Passenger):
+        if a.bidAmount() < b.bidAmount():
+            return -1
+        elif a.bidAmount() == b.bidAmount():
+            return 0
+        else:
+            return 1
+
     def finalOutput(self):
-        loggy.logPassengers([self.passengerList[i] for i in self.volunteered], True)
+        volpass = [self.passengerList[i] for i in self.volunteered]
+        volpass.sort(key=lambda x: x.bidAmount())
+        for cabin in self.scenario.cabins.keys():
+            diff = self.scenario.cabins[cabin]["passengers"] - self.scenario.cabins[cabin]["capacity"]
+            diff if diff > 0 else 0
+            for i in volpass:
+                if diff == 0:
+                    break
+                if i.details["vol_info"]["cabin"] == cabin:
+                    i.processed = True
+                    i.details["vol_info"]["processed"] = True
+                    i.leaveFlight()
+                    diff += -1
+
+
+        loggy.logPassengers(volpass, True)
         loggy.logPassengers(self.passengerList.values(), False)
         print("Checked in:", len(self.checkedIn))
         print("Seated:", len(self.seating))

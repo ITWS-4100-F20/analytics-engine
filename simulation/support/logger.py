@@ -27,6 +27,10 @@ class Logger(object):
         loc = "Simulation_Passengers"
         if volunteer:
             loc = "Simulation_Volunteers"
+        else:
+            for i in passengers:
+                if i.details["vol_info"]["processed"] == False:
+                    i.details["compensation"] = []
         client["simulation_data"][loc].update_one(
             {"sim_id": self.name},
             {"$push": {
@@ -36,12 +40,10 @@ class Logger(object):
                 }
             }
         )
-        if not volunteer:
-            total_bids = sum([len(i.details["bid_history"]) for i in passengers])
-            client["simulation_data"]["Simulations"].update_one({"id" : self.name}, {"$set" : {"volunteers":{"total_bids":total_bids}}})
         if volunteer:
             total_volunteers = len(passengers)
             total_processed = sum([1 if i.processed else 0 for i in passengers])
-            client["simulation_data"]["Simulations"].update_one({"id" : self.name}, {"$set" : {"volunteers":{"total_volunteers":total_volunteers, "total_volunteers_processed":total_processed}}})
+            total_bids = sum([i.details["compensation"][-1]["comp_amount"] if i.processed else 0 for i in passengers])
+            client["simulation_data"]["Simulations"].update_one({"id" : self.name}, {"$set" : {"volunteers":{"total_bids": total_bids,"total_volunteers":total_volunteers, "total_volunteers_processed":total_processed}}})
 
 loggy = Logger()

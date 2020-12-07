@@ -17,7 +17,7 @@ def timeCheck(env: simpy.Environment):
         wait_duration = 3600
         yield env.timeout(wait_duration)
 
-def runSimulation(scenario: Scenario):
+def runSimulation(scenario: Scenario, data:dict):
     loggy.name = scenario.uuid
     #print("Oversale Simulation initiated", datetime.fromtimestamp(scenario.oversaleStartTime), "for flight", 133, "from", scenario.departureAirport, "to", scenario.arrivalAirport, ".")
     env = simpy.Environment(initial_time=scenario.oversaleStartTime)
