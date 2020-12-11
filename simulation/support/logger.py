@@ -2,6 +2,7 @@ from simulation.passenger import Passenger
 from simulation.support.database import client
 from copy import copy
 import concurrent.futures
+import threading
 
 class Logger(object):
     def __init__(self):
@@ -20,17 +21,16 @@ class Logger(object):
         )
 
     def logEvents(self, data: dict, time:str):
-        with concurrent.futures.ThreadPoolExecutor() as exc:
-            exc.submit(self._logger, data = data, time = time)
+        thread = threading.Thread(target=self._logger, kwargs={'data' : data, "time":time}).start()
     
-    def logPassengers(self, passengers:list, volunteer):
+    def __logPassengers(self, passengers:list, volunteer):
         loc = "Simulation_Passengers"
         if volunteer:
             loc = "Simulation_Volunteers"
         for i in passengers:
             if i.details["vol_info"]["processed"] == False:
                 i.details["compensation"] = []
-        client["simulation_data"][loc].update_one(
+        client["simulation_data"][loc].update(
             {"sim_id": self.name},
             {"$push": {
                 "vol_list" : {
@@ -43,6 +43,10 @@ class Logger(object):
             total_volunteers = len(passengers)
             total_processed = sum([1 if i.processed else 0 for i in passengers])
             total_bids = sum([i.details["compensation"][-1]["comp_amount"] if i.processed else 0 for i in passengers])
-            client["simulation_data"]["Simulations"].update_one({"id" : self.name}, {"$set" : {"volunteers":{"total_bids": total_bids,"total_volunteers":total_volunteers, "total_volunteers_processed":total_processed}}})
+            client["simulation_data"]["Simulations"].update({"id" : self.name}, {"$set" : {"volunteers":{"total_bids": total_bids,"total_volunteers":total_volunteers, "total_volunteers_processed":total_processed}}})
+
+
+    def logPassengers(self, passengers:list, volunteer):
+        thread = threading.Thread(target=self.__logPassengers, kwargs={'passengers' : passengers, "volunteer":volunteer}).start()
 
 loggy = Logger()

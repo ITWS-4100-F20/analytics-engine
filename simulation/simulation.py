@@ -19,6 +19,7 @@ class Simulation(Scenario):
         self.canceled = []
         self.__setupPassengers()
         self.bids = 0
+        loggy.name = self.uuid
         
     def __setupPassengers(self):
         startid = random.randint(101,253)
@@ -73,8 +74,9 @@ class Simulation(Scenario):
                     if e[p]["pid"] in self.checkedIn:
                         self.checkedIn.remove(e[p]["pid"])
                     self.canceled.append(e[p]["pid"])
+                    loggy.logEvents(e[p], datetime.fromtimestamp(self.env.now).isoformat())
                     del eventList[e[p]["pid"]]
-                #loggy.logEvents(events[p], datetime.fromtimestamp(self.env.now).isoformat())
+                loggy.logEvents(e[p], datetime.fromtimestamp(self.env.now).isoformat())
                 self.passengers[e[p]["pid"]].events.remove(p)
                 if eventtype != "CANCELED":
                     eventList[e[p]["pid"]] = self.passengers[e[p]["pid"]].events + add
@@ -83,6 +85,21 @@ class Simulation(Scenario):
         self.env.run(until=time.mktime(self.endTime.timetuple())) 
         self.updateStatus()
         notvol = [self.passengers[i].name for i in self.passengers.keys() if i not in self.volunteered and i not in self.canceled]
+        volpass = [self.passengers[i] for i in self.volunteered]
+        volpass.sort(key=lambda x: x.bidAmount())
+        for cabin in self.cabins.keys():
+            diff = self.cabins[cabin]["passengers"] - self.cabins[cabin]["capacity"]
+            diff = diff if diff > 0 else 0
+            for i in volpass:
+                if diff == 0:
+                    break
+                if i.details["vol_info"]["cabin"] == cabin:
+                    i.processed = True
+                    i.details["vol_info"]["processed"] = True
+                    diff += -1
+        loggy.logPassengers(volpass, True)
+        loggy.logPassengers(self.passengers.values(), False)
+
         print("""COMPLETED SIMULATION\n
         bids: {}
         init_passengers: {}

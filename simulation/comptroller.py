@@ -12,7 +12,6 @@ import pickle
 class Comptroller(object):
 
     def __init__(self, keys:list, compModel:str, passengerModel:str, target:float, passTarget:str, compTarget:str, data:str):
-        test()
         self.compMod:MLPClassifier = self.__getModel(compModel)
         self.passMod:MLPClassifier = self.__getModel(passengerModel)
         self.bidNumber:int = 0
@@ -41,7 +40,6 @@ class Comptroller(object):
             row["comp_amount"] = d[0]
             pdata = numpy.array([[row[i] for i in self.keys if i != "pass-result" and i != "comp-target"]]).reshape(1,-1)
             d = self.passMod.predict_proba(pdata)
-            print(d)
             row["comp-result"] = d[0][0]
             comp_types[i]["value"] = row["comp_amount"]
             comp_types[i]["pass"] = row["comp-result"]
@@ -49,20 +47,19 @@ class Comptroller(object):
             if value < choice:
                 key = i
                 choice = value
-            print("Choice Upload ",i, value, comp_types[i]["value"], comp_types[i]["type"])
         result = True if random.randint(0, 100) < comp_types[key]["pass"] * 100 else False
         bid = {
             "accepted" : result,
             "bid_id" : self.bidNumber,
-            "etc_comp" : comp_types[key]["value"] if comp_types[key]["type"] == "ETC" else int(comp_types[key]["value"]/5),
+            "etc_comp" : int(comp_types[key]["value"] if comp_types[key]["type"] == "ETC" else int(comp_types[key]["value"]/5)),
             "initiated_by" : "USER",
-            "miles_comp": comp_types[key]["value"] * 5 if comp_types[key]["type"] == "ETC" else comp_types[key]["value"],
+            "miles_comp": int(comp_types[key]["value"] * 5 if comp_types[key]["type"] == "ETC" else comp_types[key]["value"]),
             "timestamp" : "", #datetime.fromtimestamp(p.env.now).isoformat(),
             "vol_id" : passenger["id"],
             "vol_name": passenger["pass_name"]
         }
         comp = {
-          "comp_amount": comp_types[key]["value"],
+          "comp_amount": int(comp_types[key]["value"]),
           "comp_id": self.bidNumber,
           "comp_type": comp_types[key]["type"],
           "vol_id": passenger["id"]

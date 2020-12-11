@@ -111,6 +111,7 @@ class Passenger(object):
             t = int(time.mktime(self.scenario.endTime.timetuple()) - self.env.now)
             t = random.randint(90, t)
         success, compensation, bid = comp.Bid(self.details["vol_info"], int(int(time.mktime(self.scenario.endTime.timetuple()) - self.env.now - t) / 60 / 60))
+        bid["timestamp"] = datetime.fromtimestamp(self.env.now).isoformat(),
         yield self.env.timeout(t)
         self.details["bid_history"].append(bid)
         if success:
