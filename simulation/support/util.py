@@ -31,6 +31,7 @@ def getCabins(env, cabinSpec:dict, passengers:list):
         currentPass += int(cabinSpec[i]["passengers"])
     return cabins
 
+"""
 def getScenario(scenarioname:str, parameters={}):
     startTime = time.strptime("12/01/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
     endTime = time.strptime("12/02/2020 22:00:00", "%d/%m/%Y %H:%M:%S")
@@ -78,3 +79,4 @@ def updateSenario(uuid:str):
 
 def logger(eventtype:str, msg:str, time:str):
     pass
+"""

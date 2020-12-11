@@ -1,4 +1,4 @@
-from simulation.processes.passenger import Passenger
+from simulation.passenger import Passenger
 from simulation.support.database import client
 from copy import copy
 import concurrent.futures
