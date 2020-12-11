@@ -1,26 +1,18 @@
-#this will be used to host the FLASK api server
-import time
 import threading
-from simulation.support.database import client
-from simulation.environment.scenario import Scenario
-from simulation.support.util import *
-from simulation.simulation import *
-import uuid
+from simulation.simulation import Simulation
 from flask import Flask, request
 
 app = Flask(__name__)
 
-
-def startSim(scen:Scenario, data):
-    runSimulation(scen, data)
-    updateSenario(scen.uuid)
+def __startSim(scen:Simulation):
+    scen.run()
+    pass
 
 @app.route('/simulation', methods=["POST"])
 def simulation():
     data = dict(request.json)
-    scen = getScenario(data["scenarioId"])
-    thread = threading.Thread(target = startSim, kwargs={'scen' : scen, 'data' : data["parameters"]})
-    thread.start()
+    scen = Simulation(data["scenarioId"], data["parameters"])
+    thread = threading.Thread(target=__startSim, kwargs={'scen' : scen}).start()
     return {"sim_id" :scen.uuid }
 
 if __name__ == '__main__':
