@@ -47,30 +47,48 @@ class Simulation(Scenario):
             for p in e:
                 print(e[p])
                 eventtype = e[p]["event_type"]
+                add = []
                 if eventtype == "CHECK_IN":
                     self.checkedIn.append(e[p]["pid"])
-                    self.env.process(self.passengers[e[p]["pid"]].respondToBid(self.comptroller, True))
-                    self.env.process(self.passengers[e[p]["pid"]].gateArrival())
+                    e1 = self.env.event()
+                    e2 = self.env.event()
+                    add.append(e1)
+                    add.append(e2)
+                    self.env.process(self.passengers[e[p]["pid"]].respondToBid(self.comptroller, True, e1))
+                    self.env.process(self.passengers[e[p]["pid"]].gateArrival(e2))
                 elif eventtype == "BID":
-                    res = e[p]["details"]["response"]
-                    self.bids += 1
-                    if res == 0:
-                        self.env.process(self.passengers[e[p]["pid"]].respondToBid(self.comptroller, False))
-                    else:
-                        self.volunteered.append(e[p]["pid"])
+                    t = int(time.mktime(self.endTime.timetuple()) - self.env.now)
+                    if t > 89:
+                        res = e[p]["details"]["response"]
+                        self.bids += 1
+                        if res == 0:
+                            e1 = self.env.event()
+                            add.append(e1)
+                            self.env.process(self.passengers[e[p]["pid"]].respondToBid(self.comptroller, False, e1))
+                        else:
+                            self.volunteered.append(e[p]["pid"])
                 elif eventtype == "CANCELED":
                     if e[p]["pid"] in self.volunteered:
                         self.volunteered.remove(e[p]["pid"])
                     if e[p]["pid"] in self.checkedIn:
                         self.checkedIn.remove(e[p]["pid"])
                     self.canceled.append(e[p]["pid"])
-                    eventList[e[p]["pid"]] = []
+                    del eventList[e[p]["pid"]]
                 #loggy.logEvents(events[p], datetime.fromtimestamp(self.env.now).isoformat())
                 self.passengers[e[p]["pid"]].events.remove(p)
                 if eventtype != "CANCELED":
-                    eventList[e[p]["pid"]] = self.passengers[e[p]["pid"]].events
+                    eventList[e[p]["pid"]] = self.passengers[e[p]["pid"]].events + add
 
     def run(self):
         self.env.run(until=time.mktime(self.endTime.timetuple())) 
         self.updateStatus()
-        print("COMPLETED SIMULATION\nbids: {}\npassengers: {}\nvolunteers: {}\ncheckedin: {}\ncanceled: {}\ncapacity:{}".format(self.bids, self.totalPassengers, len(self.volunteered), len(self.checkedIn), len(self.canceled), self.capacity))
+        notvol = [self.passengers[i].name for i in self.passengers.keys() if i not in self.volunteered and i not in self.canceled]
+        print("""COMPLETED SIMULATION\n
+        bids: {}
+        init_passengers: {}
+        fin_passengers: {}
+        volunteers: {}
+        not volunteers: {}
+        checkedin: {}
+        canceled: {}
+        capacity:{}""".format(self.bids, self.totalPassengers, self.totalPassengers - len(self.canceled), len(self.volunteered), len(notvol), len(self.checkedIn), len(self.canceled), self.capacity))

@@ -73,8 +73,7 @@ class Passenger(object):
             })
         self.checkin = True
 
-    def gateArrival(self):
-        res = self.env.event()
+    def gateArrival(self, res):
         self.events.append(res)
         t = int(time.mktime(self.scenario.endTime.timetuple()) - self.env.now)
         print("Time Left: ", t)
@@ -104,9 +103,7 @@ class Passenger(object):
             "name" : self.name
         }})
 
-    def respondToBid(self, comp, first):
-        print("BID TRIGGER")
-        res = self.env.event()
+    def respondToBid(self, comp, first, res):
         self.events.append(res)
         if first:
             t = 0
@@ -118,9 +115,6 @@ class Passenger(object):
         self.details["bid_history"].append(bid)
         if success:
             self.details["compensation"].append(compensation)
-            print("ACCEPTED A BID")
-        else:
-            print("REJECTED A BID")
         res.succeed(
             {
                 "pid" : self.id,

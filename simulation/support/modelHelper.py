@@ -38,15 +38,13 @@ def createModels(name, data, passengerTarget, compTarget, ignorePass:list, ignor
     comp_keys = [i for i in modelData[0].keys() if i != compTarget and i not in ignoreComp]
     pass_keys = [i for i in modelData[0].keys() if i != passengerTarget and i not in ignorePass]
     for row in modelData:
-        print(row)
         comp_train.append([row[i] for i in comp_keys])
         comp_target.append(row[compTarget])
         pass_train.append([row[i] for i in pass_keys])
         pass_target.append(row[passengerTarget])
-    print("started training")
     pass_model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(13, 100, 5, 1), random_state=1, max_iter=1000)
     pass_model.fit(pass_train, pass_target)
-    comp_model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(13, 100, 5, 1), random_state=1, max_iter=1000)
+    comp_model = MLPClassifier(solver='adam', max_iter=1000)
     comp_model.fit(comp_train, comp_target)
     pass_pickle = pickle.dumps(pass_model)
     comp_pickle = pickle.dumps(comp_model)
@@ -55,4 +53,9 @@ def createModels(name, data, passengerTarget, compTarget, ignorePass:list, ignor
     client["simulation_data"]["model"].insert_many(models)
     print("MODELS INSERTED")
 
-#createModels("final", "passenger_final", "comp-target", "comp_amount", ["pass-result", "comp-target"],["pass-result"])
+def test():
+    createModels("final", "passenger_final", "comp-target", "comp_amount", ["pass-result", "comp-target"],["pass-result"])
+#model trian
+#create schema
+#add data to schema
+#stuff related to simulation data flow
