@@ -12,7 +12,7 @@ import time
 class Simulation(Scenario):
     def __init__(self, scenarioName: str, parameters:dict):
         super().__init__(scenarioName, parameters)
-        self.comptroller:Comptroller = Comptroller(self.keys, self.compModel, self.passModel, self.target)
+        self.comptroller:Comptroller = Comptroller(self.keys, self.compModel, self.passModel, self.target, self.passTarget, self.compTarget, self.dataModel)
         self.passengers = {}
         self.checkedIn = []
         self.volunteered = []
@@ -56,7 +56,7 @@ class Simulation(Scenario):
                     self.bids += 1
                     if res == 0:
                         self.env.process(self.passengers[e[p]["pid"]].respondToBid(self.comptroller, False))
-                    elif res == 1:
+                    else:
                         self.volunteered.append(e[p]["pid"])
                 elif eventtype == "CANCELED":
                     if e[p]["pid"] in self.volunteered:

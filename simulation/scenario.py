@@ -24,6 +24,10 @@ class Scenario(object):
         self.passModel:str = self.scenarioDict["passModel"]
         self.dataModel:str = self.scenarioDict["dataModel"]
         self.target:float = self.scenarioDict["target"]
+        self.compTarget = self.scenarioDict["comp_target"]
+        self.passTarget = self.scenarioDict["pass_target"]
+        self.ignorePass = self.scenarioDict["ignore_pass"]
+        self.ignoreComp = self.scenarioDict["ignore_comp"]
         self.keys:list = self.scenarioDict["keys"]
         self.dest:str = self.scenarioDict["Arriv"]
         Thread(target=self.__startup, kwargs={}).start()

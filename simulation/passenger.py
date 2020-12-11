@@ -14,7 +14,7 @@ class Passenger(object):
         self.events:env.event = [self.env.event()]
         self.cabin:str = cabin
         self.id:str = id #From schema
-        self.gender:str = random.choice(["male", "female"])
+        self.gender:str = random.choice([1,0])
         self.name:str = names.get_full_name(gender=self.gender) #From schema
         self.processed:bool = False
         self.checkin = False
@@ -29,17 +29,17 @@ class Passenger(object):
             ],
             "vol_info" : {
                 "cabin" : self.cabin,
-                "fin_dest" : self.dest,
+                "pass_final_dest" : self.dest,
                 "id" : self.id,
-                "name" : self.name,
+                "pass_name" : self.name,
                 "processed" : False, #needs to be overwritten when processed
-                "vol_method" : random.choice(["APP","WEB","KIOSK","GATE"]),
+                "pass_volunteer_method" : random.choice(["APP","WEB","KIOSK","GATE"]),
                 "volstatus" : False,
-                "baggage": random.choice([0,1,2,3]),
-                "age" : random.randint(18, 65),
-                "gender": self.gender,
-                "memberlevel": memberchoice[0],
-                "miles" :  memberchoice[1]
+                "pass_baggage": random.choice([0,1,2,3]),
+                "pass_age" : random.randint(18, 65),
+                "pass_gender": self.gender,
+                "pass_memberlevel": memberchoice[0],
+                "pass_miles" :  memberchoice[1]
             }
         }
 
@@ -105,6 +105,7 @@ class Passenger(object):
         }})
 
     def respondToBid(self, comp, first):
+        print("BID TRIGGER")
         res = self.env.event()
         self.events.append(res)
         if first:
@@ -112,21 +113,26 @@ class Passenger(object):
         else:
             t = int(time.mktime(self.scenario.endTime.timetuple()) - self.env.now)
             t = random.randint(90, t)
+        success, compensation, bid = comp.Bid(self.details["vol_info"], int(int(time.mktime(self.scenario.endTime.timetuple()) - self.env.now - t) / 60 / 60))
         yield self.env.timeout(t)
-        #success, compensation, bid = comp(self)
-        #self.details["bid_history"].append(bid)
-        #if success:
-        #    self.details["compensation"].append(compensation)
-        res.succeed({"pid" : self.id, "event_type" : "BID", "details" : {
-            "name" : self.name,
-            "amount" : 69,
-            "ETC" : 69,
-            "response" : 1
-            #"amount" : compensation["comp_amount"],
-            #"ETC" : bid["etc_comp"],
-            #"response" : 1 if success else 0
+        self.details["bid_history"].append(bid)
+        if success:
+            self.details["compensation"].append(compensation)
+            print("ACCEPTED A BID")
+        else:
+            print("REJECTED A BID")
+        res.succeed(
+            {
+                "pid" : self.id,
+                "event_type" : "BID",
+                "details" : {
+                    "name" : self.name,
+                    "amount" : compensation["comp_amount"],
+                    "ETC" : bid["etc_comp"],
+                    "response" : 1 if success else 0
+                }
             }
-        })
+        )
 
     def bidAmount(self):
         return self.details["compensation"][-1]["comp_amount"]

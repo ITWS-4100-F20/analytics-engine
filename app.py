@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 def __startSim(scen:Simulation):
     scen.run()
+    pass
 
 @app.route('/simulation', methods=["POST"])
 def simulation():
