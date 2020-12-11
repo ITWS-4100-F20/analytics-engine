@@ -24,4 +24,4 @@ def simulation():
     return {"sim_id" :scen.uuid }
 
 if __name__ == '__main__':
-    app.run(port=3031)
+    app.run(port=3031, host='0.0.0.0')
