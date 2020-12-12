@@ -10,6 +10,9 @@ import numpy
 import pickle
 
 class Comptroller(object):
+    """
+    Controls the generation and results of bid transactions utilizing neural networks.
+    """
 
     def __init__(self, keys:list, compModel:str, passengerModel:str, target:float, passTarget:str, compTarget:str, data:str):
         self.compMod:MLPClassifier = self.__getModel(compModel)

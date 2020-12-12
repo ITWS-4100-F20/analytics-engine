@@ -1,6 +1,10 @@
 import json
 
 def flatten(data:list):
+    """
+    Flattens data rows and typecasts to datatypes from the data found in the database.
+    Returns key:value pairs.
+    """
     res = []
     for row in data:
         rowdata = {}

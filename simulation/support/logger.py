@@ -5,6 +5,9 @@ import concurrent.futures
 import threading
 
 class Logger(object):
+    """
+    Controls logging for the entire application.
+    """
     def __init__(self):
         self.name = "trash" #uuid
         self.data = []
