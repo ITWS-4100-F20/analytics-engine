@@ -50,10 +50,11 @@ def createModels(name, data, passengerTarget, compTarget, ignorePass:list, ignor
     comp_pickle = pickle.dumps(comp_model)
     models = [{"id": uuid.uuid1(), "name": name+"_pass", "prediction": passengerTarget, "schema_id": data, "version": 1, "model": pass_pickle},
     {"id": uuid.uuid1(), "name": name+"_comp", "prediction": compTarget, "schema_id": data, "version": 1, "model": comp_pickle}]
-    client["simulation_data"]["model"].insert_many(models)
+    client["simulation_data"]["Models"].insert_many(models)
 
     #Create model definition
     modelDefinition = {
+        "name" : name+"_definition",
         "compModel" : name+"_comp",
 	    "passModel" : name+"_pass",
         "dataModel" : data,
@@ -61,15 +62,18 @@ def createModels(name, data, passengerTarget, compTarget, ignorePass:list, ignor
 	    "comp_target" : compTarget,
 	    "ignore_pass" : ignorePass,
 	    "ignore_comp" : ignoreComp,
-	    "keys": modelData[0].keys()
+	    "keys": [str(i) for i in modelData[0].keys()]
     }
-    client["simulation_data"]["model_definitions"].insert_one(modelDefinition)
+    client["simulation_data"]["Model_Definitions"].insert_one(modelDefinition)
 
     print("MODELS INSERTED")
 
 def test():
-    createModels("final", "passenger_final", "comp-target", "comp_amount", ["pass-result", "comp-target"],["pass-result"])
-#model trian
-#create schema
-#add data to schema
-#stuff related to simulation data flow
+    createModels("Example", "Example_Passenger", "comp-target", "comp_amount", ["pass-result", "comp-target"],["pass-result"])
+
+
+"""
+- Need an endpoint that takes given parameters and runs the createModels function. -> copy code in this file to endpoint
+- 
+
+"""

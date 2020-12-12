@@ -22,7 +22,7 @@ class Comptroller(object):
         modelData, self.keystore = numeric(flatten([dict(i) for i in client["simulation_data"][data].find({})]))
     
     def __getModel(self, name:str):
-        return pickle.loads([i for i in client["simulation_data"]["model"].find({"name" : name}).sort("_id",-1).limit(1)][0]["model"])
+        return pickle.loads([i for i in client["simulation_data"]["Models"].find({"name" : name}).sort("_id",-1).limit(1)][0]["model"])
     
     def Bid(self, passenger:dict, timeleft:int):
         comp_types = {0: {"type": "ETC", "value" : 0, "pass" : 0}, 1: {"type": "MILES", "value" : 0, "pass" : 0}}

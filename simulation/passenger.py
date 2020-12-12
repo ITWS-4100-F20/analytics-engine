@@ -7,6 +7,13 @@ import numpy.random
 from simulation.scenario import Scenario
 
 class Passenger(object):
+    """
+    Initialzes and controls the processes and actions of a passenger.
+
+    This passenger class may need to be modified to include the necessary fields defined in the simulation
+    model keys list.
+    """
+
     def __init__(self, env:simpy.Environment, scenario:Scenario, id:str, cabin:str, dest:str):
         self.dest = dest
         self.scenario:Scenario = scenario

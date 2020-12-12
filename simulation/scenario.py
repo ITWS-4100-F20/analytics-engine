@@ -9,10 +9,11 @@ from simulation.support.database import client
 class Scenario(object):
 
     def __init__(self, scenarioName: str, parameters:dict):
-        self.scenarioDict:dict = dict(client["simulation_data"]["scenarios"].find_one({"id":scenarioName}))        
+        self.scenarioDict:dict = dict(client["simulation_data"]["Scenarios"].find_one({"id":scenarioName}))        
         self.uuid:str = str(uuid.uuid1())
         self.name:str = scenarioName
         self.parameters:dict = parameters
+        self.modelDefinition:dict = dict(client["simulation_data"]["Model_Definitions"].find_one({"name":self.scenarioDict["modelDefinition"]}))
         self.startTime:datetime = datetime.strptime(self.scenarioDict["startTime"], "%d/%m/%Y %H:%M:%S")
         self.endTime:datetime = datetime.strptime(self.scenarioDict["endTime"], "%d/%m/%Y %H:%M:%S")
         self.triggerTime:datetime = datetime.now()
@@ -20,15 +21,15 @@ class Scenario(object):
         self.newPassengers:int = self.scenarioDict["newPassengers"]
         self.capacity = sum(self.cabins[i]["capacity"] for i in self.cabins.keys())
         self.totalPassengers:int = sum(self.cabins[i]["passengers"] for i in self.cabins.keys()) + self.newPassengers
-        self.compModel:str = self.scenarioDict["compModel"]
-        self.passModel:str = self.scenarioDict["passModel"]
-        self.dataModel:str = self.scenarioDict["dataModel"]
+        self.compModel:str = self.modelDefinition["compModel"]
+        self.passModel:str = self.modelDefinition["passModel"]
+        self.dataModel:str = self.modelDefinition["dataModel"]
         self.target:float = self.scenarioDict["target"]
-        self.compTarget = self.scenarioDict["comp_target"]
-        self.passTarget = self.scenarioDict["pass_target"]
-        self.ignorePass = self.scenarioDict["ignore_pass"]
-        self.ignoreComp = self.scenarioDict["ignore_comp"]
-        self.keys:list = self.scenarioDict["keys"]
+        self.compTarget = self.modelDefinition["comp_target"]
+        self.passTarget = self.modelDefinition["pass_target"]
+        self.ignorePass = self.modelDefinition["ignore_pass"]
+        self.ignoreComp = self.modelDefinition["ignore_comp"]
+        self.keys:list = self.modelDefinition["keys"]
         self.dest:str = self.scenarioDict["Arriv"]
         Thread(target=self.__startup, kwargs={}).start()
         self.env:simpy.Environment = simpy.Environment(initial_time=time.mktime(self.startTime.timetuple()))
