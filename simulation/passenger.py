@@ -15,6 +15,12 @@ class Passenger(object):
     """
 
     def __init__(self, env:simpy.Environment, scenario:Scenario, id:str, cabin:str, dest:str):
+        """
+        Initializes the passenger object with required fields. Note that fields like name are generated at this
+        stage.
+
+        This can be modified to match any specific passenger model that united wants to test.
+        """
         self.dest = dest
         self.scenario:Scenario = scenario
         self.env:simpy.Environment = env
@@ -27,6 +33,7 @@ class Passenger(object):
         self.checkin = False
         self.gate = False
         memberchoice:dict = random.choice([("None", random.randint(0, 25000)), ("Silver", random.randint(25000, 75000)), ("Gold", random.randint(75000, 150000)), ("Platinum", random.randint(150000, 250000))])
+        # This dictionary is used for logging detials about the passenger to the simulation UI
         self.details:dict = {
             "bid_history" : [
 
@@ -52,6 +59,7 @@ class Passenger(object):
 
     
     def start(self):
+        # Initializes the passenger with a checkin and cancel event.
         res = self.events[0]
         yield self.env.timeout(0)
         self.env.process(self.checkIn())
@@ -66,6 +74,7 @@ class Passenger(object):
             })
 
     def checkIn(self):
+        # Checks the passenger in.
         res = self.env.event()
         self.events.append(res)
         t = numpy.random.normal(0, 10000)
@@ -81,6 +90,7 @@ class Passenger(object):
         self.checkin = True
 
     def gateArrival(self, res):
+        # Determines if the passenger makes it to the gate, and at what time.
         self.events.append(res)
         t = int(time.mktime(self.scenario.endTime.timetuple()) - self.env.now)
         print("Time Left: ", t)
@@ -97,7 +107,8 @@ class Passenger(object):
         self.gate = True
 
     def cancel(self):
-        if random.randint(0, 100) > 2:
+        # Determines if the passenger misses the flight.
+        if random.randint(0, 100) > 2: #2% chance of missing flight.
             return
         t = int(time.mktime(self.scenario.endTime.timetuple()) - self.env.now)
         if t < 300:
@@ -111,6 +122,7 @@ class Passenger(object):
         }})
 
     def respondToBid(self, comp, first, res):
+        #Controls how the passenger responds to bids, their delay, etc.
         self.events.append(res)
         if first:
             t = 0

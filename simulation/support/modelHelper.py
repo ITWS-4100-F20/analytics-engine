@@ -6,8 +6,19 @@ import pymongo
 import numpy
 import pickle
 
+"""
+Creates models and converts data to match models.
+
+This file can be used to create models compatible with this
+simulation engine. In other words it creates one neural network
+to act as the passenger and another to act as the bid creator. 
+"""
 
 def keyed_numeric(data, keystore:dict):
+    """
+    Converts rows of data to match the normalized data used to train
+    the models.
+    """
     keys = data.keys()
     for i in keys:
         if type(data[i]) == type(""):
@@ -17,6 +28,9 @@ def keyed_numeric(data, keystore:dict):
     return (data, keystore) 
 
 def numeric(data):
+    """
+    Normalizes the data going into the model training so it is all numeric enums.
+    """
     keystore = {}
     keys = data[0].keys()
     for i in keys:
@@ -30,6 +44,9 @@ def numeric(data):
     return (data, keystore)
 
 def createModels(name, data, passengerTarget, compTarget, ignorePass:list, ignoreComp:list):
+    """
+    Creates and trains passenger and bid creator models.
+    """
     modelData, keystore = numeric(flatten([dict(i) for i in client["simulation_data"][data].find({})]))
     comp_train = []
     comp_target = []
@@ -52,7 +69,7 @@ def createModels(name, data, passengerTarget, compTarget, ignorePass:list, ignor
     {"id": uuid.uuid1(), "name": name+"_comp", "prediction": compTarget, "schema_id": data, "version": 1, "model": comp_pickle}]
     client["simulation_data"]["Models"].insert_many(models)
 
-    #Create model definition
+    #Create model definition and stor
     modelDefinition = {
         "name" : name+"_definition",
         "compModel" : name+"_comp",
@@ -70,10 +87,3 @@ def createModels(name, data, passengerTarget, compTarget, ignorePass:list, ignor
 
 def test():
     createModels("Example", "Example_Passenger", "comp-target", "comp_amount", ["pass-result", "comp-target"],["pass-result"])
-
-
-"""
-- Need an endpoint that takes given parameters and runs the createModels function. -> copy code in this file to endpoint
-- 
-
-"""

@@ -7,6 +7,9 @@ from simulation.support.database import client
 #from simulation.environment.flight_manifest import FlightManifest as Manifest
 
 class Scenario(object):
+    """
+    Contains all information pertinent to the running of a simulation. Simplifies simulation class.
+    """
 
     def __init__(self, scenarioName: str, parameters:dict):
         self.scenarioDict:dict = dict(client["simulation_data"]["Scenarios"].find_one({"id":scenarioName}))        
@@ -33,9 +36,7 @@ class Scenario(object):
         self.dest:str = self.scenarioDict["Arriv"]
         Thread(target=self.__startup, kwargs={}).start()
         self.env:simpy.Environment = simpy.Environment(initial_time=time.mktime(self.startTime.timetuple()))
-        #self.manifest:Manifest = 1#
         self.env.process(self.__hourTimer())
-        #self.manifest.finalOutput()
 
     def __hourTimer(self):
         while True:
@@ -43,6 +44,9 @@ class Scenario(object):
             yield self.env.timeout(3600)
 
     def __startup(self):
+        """
+        Initializes DB for logging later.
+        """
         client["simulation_data"]["Simulations"].insert_one({
             "id" : self.uuid,
             "scenario_name": self.name,
@@ -79,6 +83,9 @@ class Scenario(object):
         }) 
 
     def __updateStatus(self):
+        """
+        Updates DB with finished status.
+        """
         client["simulation_data"]["Simulations"].update_one({"id" : self.uuid}, {"$set" : {"status":"SUCCESS"}})
 
     def updateStatus(self):

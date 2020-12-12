@@ -10,6 +10,9 @@ import random
 import time
 
 class Simulation(Scenario):
+    """
+    Controls the entire simulation.
+    """
     def __init__(self, scenarioName: str, parameters:dict):
         super().__init__(scenarioName, parameters)
         self.comptroller:Comptroller = Comptroller(self.keys, self.compModel, self.passModel, self.target, self.passTarget, self.compTarget, self.dataModel)
@@ -22,6 +25,9 @@ class Simulation(Scenario):
         loggy.name = self.uuid
         
     def __setupPassengers(self):
+        """
+        Initializes all the passengers, their cabins, and their processes.
+        """
         startid = random.randint(101,253)
         for key in self.cabins.keys():
             for i in range(0, self.cabins[key]["passengers"]):
@@ -43,6 +49,10 @@ class Simulation(Scenario):
         return res
 
     def __passengerWait(self, eventList):
+        """
+        Listens for events returned by passenger objects. Controls the next moves by the simulation 
+        regarding that passenger.
+        """
         while sum(len(i) for i in eventList.values()) > 0:
             e = yield AnyOf(self.env, self.__join(eventList)) 
             for p in e:
@@ -82,6 +92,9 @@ class Simulation(Scenario):
                     eventList[e[p]["pid"]] = self.passengers[e[p]["pid"]].events + add
 
     def run(self):
+        """
+        Runs the simulation and controls final logging.
+        """
         self.env.run(until=time.mktime(self.endTime.timetuple())) 
         self.updateStatus()
         notvol = [self.passengers[i].name for i in self.passengers.keys() if i not in self.volunteered and i not in self.canceled]
